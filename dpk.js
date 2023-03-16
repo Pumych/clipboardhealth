@@ -22,11 +22,3 @@ exports.deterministicPartitionKey = (event) => {
 
   return candidate || TRIVIAL_PARTITION_KEY;
 };
-
-/**
- * What is refactored:
- * 1. Removed unnecessary if statement
- * 2. Used optional chaining to simplify code
- * 3. Used ternary operator to simplify the last if statement
- *
- */
