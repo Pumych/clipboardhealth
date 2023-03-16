@@ -5,24 +5,28 @@ exports.deterministicPartitionKey = (event) => {
   const MAX_PARTITION_KEY_LENGTH = 256;
   let candidate;
 
-  if (event) {
-    if (event.partitionKey) {
-      candidate = event.partitionKey;
-    } else {
-      const data = JSON.stringify(event);
-      candidate = crypto.createHash("sha3-512").update(data).digest("hex");
-    }
+  if(!event) return TRIVIAL_PARTITION_KEY;
+
+  if (event?.partitionKey) {
+    candidate = event.partitionKey;
+  } else {
+    const data = JSON.stringify(event);
+    candidate = crypto.createHash("sha3-512").update(data).digest("hex");
   }
 
-  if (candidate) {
-    if (typeof candidate !== "string") {
-      candidate = JSON.stringify(candidate);
-    }
-  } else {
-    candidate = TRIVIAL_PARTITION_KEY;
+  if (typeof candidate !== "string") {
+    candidate = JSON.stringify(candidate);
   }
-  if (candidate.length > MAX_PARTITION_KEY_LENGTH) {
-    candidate = crypto.createHash("sha3-512").update(candidate).digest("hex");
-  }
-  return candidate;
+
+  candidate = candidate.length > MAX_PARTITION_KEY_LENGTH ? crypto.createHash("sha3-512").update(candidate).digest("hex") : candidate;
+
+  return candidate || TRIVIAL_PARTITION_KEY;
 };
+
+/**
+ * What is refactored:
+ * 1. Removed unnecessary if statement
+ * 2. Used optional chaining to simplify code
+ * 3. Used ternary operator to simplify the last if statement
+ *
+ */
